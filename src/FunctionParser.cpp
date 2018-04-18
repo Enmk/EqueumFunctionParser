@@ -4,6 +4,7 @@
 */
 
 #include "FunctionParser.h"
+#include "Tokenizer.h"
 
 #include <regex>
 
@@ -45,5 +46,7 @@ bool isValidName(const std::string& name) noexcept
 
 FunctionSpec parseFunctionSpec(std::string& input)
 {
+    Tokenizer tokenizer(input);
+
 
 }

@@ -1,4 +1,9 @@
-#include "tokenizer.h"
+/*
+ * This file is licensed under CC0 license.
+ * Author: Vasily Nemkov (v.nemkov@gmail.com)
+*/
+
+#include "Tokenizer.h"
 
 namespace
 {
@@ -19,7 +24,7 @@ TokenType getCharacterTokenType(char c)
     }
     if (isspace(c))
     {
-        return TOKEN_WHIESPACE;
+        return TOKEN_WHITESPACE;
     }
     else if (isnumber(c) || c == '.')
     {
@@ -31,13 +36,6 @@ TokenType getCharacterTokenType(char c)
     }
 }
 
-//void skipsSpace(boost::string_view& v)
-//{
-//    const auto p = std::find_if_not(v.begin(), v.end(), std::isspace);
-//    const auto size = v.end() - p;
-//    v.remove_prefix(size);
-//}
-
 size_t findLengthOfStringLiteral(const boost::string_view& str)
 {
     bool is_escaped = false;
@@ -46,7 +44,6 @@ size_t findLengthOfStringLiteral(const boost::string_view& str)
     for (size_t i = 0; i < str.length(); ++i)
     {
         const char c = str[i];
-
         if (c == '\\')
         {
             is_escaped = !is_escaped;
@@ -58,8 +55,12 @@ size_t findLengthOfStringLiteral(const boost::string_view& str)
             // quotation mark that terminated string literal.
             if (!is_quoted)
             {
-                return i;
+                return i + 1;
             }
+        }
+        else if (is_escaped)
+        {
+            is_escaped = false;
         }
     }
     return 0;
@@ -76,10 +77,10 @@ Token Tokenizer::getNextToken()
 {
     if (input.empty())
     {
-        return Token{TOKEN_END_OF_INPUT, input};
+        return Token{input, TOKEN_END_OF_INPUT};
     }
 
-    TokenType tokenType = getCharacterTokenType(input.front());
+    const TokenType tokenType = getCharacterTokenType(input.front());
     size_t tokenLen = 0;
     if (input.front() == '"')
     {
@@ -87,16 +88,16 @@ Token Tokenizer::getNextToken()
     }
     else
     {
-        // Eat characters of same type one by one.
-        const auto p = std::find_if(input.begin(), input.end(),
+        const auto p = std::find_if_not(input.cbegin(), input.cend(),
                 [tokenType](const char c) -> bool
         {
-            return isspace(c) || tokenType == getCharacterTokenType(c);
+            return tokenType == getCharacterTokenType(c);
         });
-        tokenLen = input.end() - p;
+
+        tokenLen = p - input.begin();
     }
 
-    const Token result{tokenType, input.substr(0, tokenLen)};
+    const Token result{input.substr(0, tokenLen), tokenType};
     input.remove_prefix(tokenLen);
 
     return result;

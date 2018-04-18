@@ -5,8 +5,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(function_parser)
 
-add_executable(function_parser
-    FunctionParser.cpp
-    Tokenizer.cpp
-    main.cpp
-)
+add_subdirectory(./src)
+add_subdirectory(./test)
+add_subdirectory(./third-party/gtest/)

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.6.0, 2018-04-18T11:03:11. -->
+<!-- Written by QtCreator 4.6.0, 2018-04-18T15:35:17. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -216,7 +216,7 @@
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguation.Title">function_parser</value>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.Arguments"></value>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory"></value>
-    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory.default">/var/folders/4y/bz8_fkqs2gv18rpr4mc5fmqh0000gn/T/QtCreator-TPqCih/qtc-cmake-THHYUcCN</value>
+    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory.default">/Users/enmk/proj/build-equeum-Desktop-Debug</value>
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">function_parser</value>
