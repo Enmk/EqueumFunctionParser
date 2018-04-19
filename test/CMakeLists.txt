@@ -3,6 +3,7 @@ add_executable(test_function_parser
 
     main.cpp
     test_tokenizer.cpp
+    test_lexer.cpp
 )
 
 target_include_directories(test_function_parser

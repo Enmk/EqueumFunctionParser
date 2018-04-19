@@ -5,6 +5,9 @@
 
 #include "Tokenizer.h"
 
+#include <algorithm>
+#include <limits>
+
 namespace
 {
 TokenType getCharacterTokenType(char c)
@@ -21,19 +24,45 @@ TokenType getCharacterTokenType(char c)
         case '/':
         case '*':
             return TOKEN_OP;
+        case '.':
+        case ',':
+        case ':':
+        case ';':
+            return TOKEN_PUNCT;
     }
     if (isspace(c))
     {
         return TOKEN_WHITESPACE;
     }
-    else if (isnumber(c) || c == '.')
+    else if (isnumber(c))
     {
-        return TOKEN_NUMBER_LITERAL;
+        return TOKEN_NUMBER;
     }
     else
     {
-        return TOKEN_STRING_LITERAL;
+        return TOKEN_STRING;
     }
+}
+
+size_t getMaxTokenLength(TokenType type)
+{
+    const size_t MaxTokenLength = std::numeric_limits<size_t>::max();
+    switch(type)
+    {
+        case TOKEN_WHITESPACE:
+        case TOKEN_QUOTED_STRING:
+        case TOKEN_STRING:
+        case TOKEN_NUMBER:
+            return MaxTokenLength;
+        case TOKEN_LPAR:
+        case TOKEN_RPAR:
+        case TOKEN_OP:
+        case TOKEN_PUNCT:
+            return 1;
+        case TOKEN_END_OF_INPUT:
+            return 0;
+    }
+    return MaxTokenLength;
 }
 
 size_t findLengthOfStringLiteral(const boost::string_view& str)
@@ -80,10 +109,11 @@ Token Tokenizer::getNextToken()
         return Token{input, TOKEN_END_OF_INPUT};
     }
 
-    const TokenType tokenType = getCharacterTokenType(input.front());
+    TokenType tokenType = getCharacterTokenType(input.front());
     size_t tokenLen = 0;
     if (input.front() == '"')
     {
+        tokenType = TOKEN_QUOTED_STRING;
         tokenLen = findLengthOfStringLiteral(input);
     }
     else
@@ -93,10 +123,14 @@ Token Tokenizer::getNextToken()
         {
             return tokenType == getCharacterTokenType(c);
         });
+//        if (p != input.end())
+//        {
+
+//        }
 
         tokenLen = p - input.begin();
     }
-
+    tokenLen = std::min(getMaxTokenLength(tokenType), tokenLen);
     const Token result{input.substr(0, tokenLen), tokenType};
     input.remove_prefix(tokenLen);
 

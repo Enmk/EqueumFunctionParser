@@ -22,8 +22,10 @@ inline std::ostream& operator<<(std::ostream& ostr, TokenType tokenType)
         TYPE_STRING(TOKEN_LPAR),
         TYPE_STRING(TOKEN_RPAR),
         TYPE_STRING(TOKEN_OP),
-        TYPE_STRING(TOKEN_STRING_LITERAL),
-        TYPE_STRING(TOKEN_NUMBER_LITERAL),
+        TYPE_STRING(TOKEN_PUNCT),
+        TYPE_STRING(TOKEN_STRING),
+        TYPE_STRING(TOKEN_QUOTED_STRING),
+        TYPE_STRING(TOKEN_NUMBER),
         TYPE_STRING(TOKEN_END_OF_INPUT),
     };
     return ostr << TokenTypeNames.at(tokenType);
@@ -81,17 +83,52 @@ TEST_P(TokenTest, getNextToken)
 const TokenTestCase TokenOneTypeTestCases[] =
 {
     ONE_TOKEN_TEST_CASE(" \v\t\n\r ", TOKEN_WHITESPACE),
-    ONE_TOKEN_TEST_CASE("123", TOKEN_NUMBER_LITERAL),
-    ONE_TOKEN_TEST_CASE("123.4", TOKEN_NUMBER_LITERAL),
-    ONE_TOKEN_TEST_CASE("abcd", TOKEN_STRING_LITERAL),
-    ONE_TOKEN_TEST_CASE("+-*/=", TOKEN_OP),
-    ONE_TOKEN_TEST_CASE("+-*/=", TOKEN_OP),
-    ONE_TOKEN_TEST_CASE("(((", TOKEN_LPAR),
-    ONE_TOKEN_TEST_CASE(")))", TOKEN_RPAR),
-    ONE_TOKEN_TEST_CASE(R"("")", TOKEN_STRING_LITERAL),
-    ONE_TOKEN_TEST_CASE(R"("abc")", TOKEN_STRING_LITERAL),
-    ONE_TOKEN_TEST_CASE(R"(" ")", TOKEN_STRING_LITERAL),
-    ONE_TOKEN_TEST_CASE(R"("\"")", TOKEN_STRING_LITERAL),
+    ONE_TOKEN_TEST_CASE("123", TOKEN_NUMBER),
+    ONE_TOKEN_TEST_CASE("0", TOKEN_NUMBER),
+    ONE_TOKEN_TEST_CASE("abcd", TOKEN_STRING),
+    ONE_TOKEN_TEST_CASE("+", TOKEN_OP),
+    ONE_TOKEN_TEST_CASE("-", TOKEN_OP),
+    ONE_TOKEN_TEST_CASE("*", TOKEN_OP),
+    ONE_TOKEN_TEST_CASE("/", TOKEN_OP),
+    ONE_TOKEN_TEST_CASE("=", TOKEN_OP),
+    ONE_TOKEN_TEST_CASE("(", TOKEN_LPAR),
+    ONE_TOKEN_TEST_CASE(")", TOKEN_RPAR),
+    ONE_TOKEN_TEST_CASE(".", TOKEN_PUNCT),
+    ONE_TOKEN_TEST_CASE(",", TOKEN_PUNCT),
+    ONE_TOKEN_TEST_CASE(":", TOKEN_PUNCT),
+    ONE_TOKEN_TEST_CASE(";", TOKEN_PUNCT),
+    ONE_TOKEN_TEST_CASE(R"("")", TOKEN_QUOTED_STRING),
+    ONE_TOKEN_TEST_CASE(R"("abc")", TOKEN_QUOTED_STRING),
+    ONE_TOKEN_TEST_CASE(R"(" ")", TOKEN_QUOTED_STRING),
+    ONE_TOKEN_TEST_CASE(R"("\"")", TOKEN_QUOTED_STRING),
+};
+
+const TokenTestCase TokenSplitSequenceTestCases[] =
+{
+    {
+        "((",
+        {
+            Token{"(", TOKEN_LPAR},
+            Token{"(", TOKEN_LPAR},
+        }
+    },
+    {
+        "))",
+        {
+            Token{")", TOKEN_RPAR},
+            Token{")", TOKEN_RPAR},
+        }
+    },
+    {
+        "+-*/=",
+        {
+            Token{"+", TOKEN_OP},
+            Token{"-", TOKEN_OP},
+            Token{"*", TOKEN_OP},
+            Token{"/", TOKEN_OP},
+            Token{"=", TOKEN_OP},
+        }
+    },
 };
 
 const TokenTestCase TokenCompoundTestCases[] =
@@ -99,8 +136,8 @@ const TokenTestCase TokenCompoundTestCases[] =
     {
         "a1()",
         {
-            Token{"a", TOKEN_STRING_LITERAL},
-            Token{"1", TOKEN_NUMBER_LITERAL},
+            Token{"a", TOKEN_STRING},
+            Token{"1", TOKEN_NUMBER},
             Token{"(", TOKEN_LPAR},
             Token{")", TOKEN_RPAR},
         }
@@ -109,22 +146,35 @@ const TokenTestCase TokenCompoundTestCases[] =
         "(1( )2)",
         {
             Token{"(", TOKEN_LPAR},
-            Token{"1", TOKEN_NUMBER_LITERAL},
+            Token{"1", TOKEN_NUMBER},
             Token{"(", TOKEN_LPAR},
             Token{" ", TOKEN_WHITESPACE},
             Token{")", TOKEN_RPAR},
-            Token{"2", TOKEN_NUMBER_LITERAL},
+            Token{"2", TOKEN_NUMBER},
             Token{")", TOKEN_RPAR},
         }
     },
     {
         "function_name(arg=1)",
         {
-            Token{"function_name", TOKEN_STRING_LITERAL},
+            Token{"function_name", TOKEN_STRING},
             Token{"(", TOKEN_LPAR},
-            Token{"arg", TOKEN_STRING_LITERAL},
+            Token{"arg", TOKEN_STRING},
             Token{"=", TOKEN_OP},
-            Token{"1", TOKEN_NUMBER_LITERAL},
+            Token{"1", TOKEN_NUMBER},
+            Token{")", TOKEN_RPAR},
+        }
+    },
+    {
+        "function_name123test(arg=1)",
+        {
+            Token{"function_name", TOKEN_STRING},
+            Token{"123", TOKEN_NUMBER},
+            Token{"test", TOKEN_STRING},
+            Token{"(", TOKEN_LPAR},
+            Token{"arg", TOKEN_STRING},
+            Token{"=", TOKEN_OP},
+            Token{"1", TOKEN_NUMBER},
             Token{")", TOKEN_RPAR},
         }
     }
@@ -133,6 +183,11 @@ const TokenTestCase TokenCompoundTestCases[] =
 INSTANTIATE_TEST_CASE_P(
         OneType, TokenTest,
         ::testing::ValuesIn(TokenOneTypeTestCases),
+);
+
+INSTANTIATE_TEST_CASE_P(
+        SplitSequence, TokenTest,
+        ::testing::ValuesIn(TokenSplitSequenceTestCases),
 );
 
 INSTANTIATE_TEST_CASE_P(

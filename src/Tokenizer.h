@@ -14,8 +14,10 @@ enum TokenType
     TOKEN_LPAR,
     TOKEN_RPAR,
     TOKEN_OP, // = + - / *
-    TOKEN_STRING_LITERAL, // quoted or unquoted string literal
-    TOKEN_NUMBER_LITERAL, // number with\without decimal point
+    TOKEN_PUNCT, // punctuation marks: .,;:
+    TOKEN_QUOTED_STRING, // unquoted string literal
+    TOKEN_STRING, // unquoted string literal
+    TOKEN_NUMBER, // number without decimal point
 
     TOKEN_END_OF_INPUT // the last token
 };

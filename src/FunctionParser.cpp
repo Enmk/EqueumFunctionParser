@@ -44,9 +44,7 @@ bool isValidName(const std::string& name) noexcept
     return std::regex_match(name, NameRegex);
 }
 
-FunctionSpec parseFunctionSpec(std::string& input)
+FunctionSpec parseFunctionSpec(std::string& /*input*/)
 {
-    Tokenizer tokenizer(input);
-
-
+    return FunctionSpec();
 }
