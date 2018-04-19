@@ -40,6 +40,8 @@ FunctionSpec parseFunctionSpec(const std::string& input)
         }
         if (lex.type == LEX_PUNCTUATION && lex.value == ",")
         {
+            assert(!result.parameters.empty() && "Stray comma");
+
             // skip to the next argument.
             continue;
         }
