@@ -17,16 +17,21 @@ namespace
 const boost::optional<std::string> UnsetOptionalString;
 } // namespace
 
-bool operator==(const FunctionSpecParameter& left, const FunctionSpecParameter& right)
+template <typename T>
+bool isEqualParameters(const T& left, const T& right)
 {
     return left.name == right.name && left.value == right.value;
 }
 
-struct FunctionParserSpecTestCase
+inline bool operator==(const FunctionSpecParameter& left, const FunctionSpecParameter& right)
 {
-    const char* input;
-    const FunctionSpec spec;
-};
+    return isEqualParameters(left, right);
+}
+
+inline bool operator==(const FunctionCallParameter& left, const FunctionCallParameter& right)
+{
+    return isEqualParameters(left, right);
+}
 
 inline std::ostream& operator<<(std::ostream& ostr, const FunctionSpecParameter& spec)
 {
@@ -38,6 +43,23 @@ inline std::ostream& operator<<(std::ostream& ostr, const FunctionSpecParameter&
 
     return ostr;
 }
+
+inline std::ostream& operator<<(std::ostream& ostr, const FunctionCallParameter& spec)
+{
+    if (spec.name)
+    {
+        ostr << *spec.name << " = ";
+    }
+
+    return ostr << spec.value;
+}
+
+
+struct FunctionParserSpecTestCase
+{
+    const char* input;
+    const FunctionSpec spec;
+};
 
 inline std::ostream& operator<<(std::ostream& ostr, const FunctionParserSpecTestCase& testCase)
 {
@@ -117,4 +139,91 @@ TEST_P(FunctionParserSpecTest, parseFunctionSpec)
 INSTANTIATE_TEST_CASE_P(
         Simple, FunctionParserSpecTest,
         ::testing::ValuesIn(SpecTestCases),
+);
+
+struct FunctionParserCallTestCase
+{
+    const char* input;
+    const FunctionCall call;
+};
+
+inline std::ostream& operator<<(std::ostream& ostr, const FunctionParserCallTestCase& testCase)
+{
+    ostr << "ParseFunctionCallTestCase{\n\t\"" << testCase.input << "\""
+            << ",\n\t" << testCase.call.name << "(";
+
+    for (const auto& p : testCase.call.parameters)
+    {
+        ostr << " " << p;
+
+        if (&p != &testCase.call.parameters.back())
+        {
+            ostr << ", ";
+        }
+    }
+
+    return ostr << ")\n}";
+}
+
+const FunctionParserCallTestCase CallTestCases[] =
+{
+    {
+        "a()",
+        {
+            "a",
+            {}
+        }
+    },
+    {
+        "abcdef123()",
+        {
+            "abcdef123",
+            {}
+        }
+    },
+    {
+        "function(1,2,c=3)",
+        {
+            "function",
+            {
+                FunctionCallParameter{UnsetOptionalString, "1"},
+                FunctionCallParameter{UnsetOptionalString, "2"},
+                FunctionCallParameter{std::string("c"), "3"}
+            }
+        }
+    },
+    {
+        R"(function("a", 2 , c = 3, d = "foobar") )",
+        {
+            "function",
+            {
+                FunctionCallParameter{UnsetOptionalString, R"("a")"},
+                FunctionCallParameter{UnsetOptionalString, "2"},
+                FunctionCallParameter{std::string("c"), "3"},
+                FunctionCallParameter{std::string("d"), R"("foobar")"},
+            }
+        }
+    }
+};
+
+class FunctionParserCallTest : public ::testing::TestWithParam<FunctionParserCallTestCase>
+{};
+
+TEST_P(FunctionParserCallTest, parseFunctionCall)
+{
+    const FunctionParserCallTestCase& testCase = GetParam();
+    FunctionCall call = parseFunctionCall(testCase.input);
+
+    EXPECT_EQ(testCase.call.name, call.name);
+    EXPECT_EQ(testCase.call.parameters.size(), call.parameters.size());
+    for (int i = 0; i < testCase.call.parameters.size(); ++i)
+    {
+        EXPECT_EQ(testCase.call.parameters[i], call.parameters[i]);
+    }
+}
+
+
+INSTANTIATE_TEST_CASE_P(
+        Simple, FunctionParserCallTest,
+        ::testing::ValuesIn(CallTestCases),
 );
