@@ -5,40 +5,12 @@
 
 #include "Lexer.h"
 
+#include "Utility.h"
+
 #include <gtest/gtest.h>
 
-#include <boost/preprocessor/stringize.hpp>
-
 #include <ostream>
-#include <unordered_map>
 #include <vector>
-
-inline std::ostream& operator<<(std::ostream& ostr, LexemeType lexType)
-{
-#define TYPE_STRING(T) {T, BOOST_PP_STRINGIZE(T)}
-    static const std::unordered_map<size_t, const char*> LexTypeNames =
-    {
-        TYPE_STRING(LEX_NUMBER_LITERAL),
-        TYPE_STRING(LEX_STRING_LITERAL),
-        TYPE_STRING(LEX_NAME),
-        TYPE_STRING(LEX_OPERATOR),
-        TYPE_STRING(LEX_PUNCTUATION),
-        TYPE_STRING(LEX_LEFT_PARENTHESIS),
-        TYPE_STRING(LEX_RIGHT_PARENTHESIS),
-        TYPE_STRING(LEX_END_OF_INPUT)
-    };
-    return ostr << LexTypeNames.at(lexType);
-}
-
-inline std::ostream& operator<<(std::ostream& ostr, const Lexeme& lex)
-{
-    return ostr << "Lexeme{\"" << lex.value << "\", " << lex.type << "}";
-}
-
-inline bool operator==(const Lexeme& left, const Lexeme& right)
-{
-    return left.type == right.type && left.value == right.value;
-}
 
 static const Lexeme EofLexeme{std::string(), LEX_END_OF_INPUT};
 

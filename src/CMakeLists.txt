@@ -18,4 +18,5 @@ add_library(
     FunctionParser.cpp
     Tokenizer.cpp
     Lexer.cpp
+    FunctionRegistry.cpp
 )

@@ -8,7 +8,9 @@
 
 #include <boost/utility/string_view.hpp>
 
-enum TokenType
+#include <string>
+
+enum TokenType : int
 {
     TOKEN_WHITESPACE, // any whitespace
     TOKEN_LPAR,

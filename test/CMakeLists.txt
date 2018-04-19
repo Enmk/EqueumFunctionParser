@@ -5,6 +5,9 @@ add_executable(test_function_parser
     test_Tokenizer.cpp
     test_Lexer.cpp
     test_FunctionParser.cpp
+    test_FunctionRegistry.cpp
+
+    Utility.cpp
 )
 
 target_include_directories(test_function_parser

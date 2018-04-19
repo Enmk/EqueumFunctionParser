@@ -36,14 +36,6 @@ struct FunctionCall
     std::vector<FunctionCallParameter> parameters;
 };
 
-/** Parse function spec from given input.
- *
- * Parsing is performed by skipping any leading whitespace first.
- *
- * @param input - input string containing function spec.
- * @return FunctionSpec object.
- * @throw exception if input has no function spec.
- */
 FunctionSpec parseFunctionSpec(const std::string& input);
 FunctionCall parseFunctionCall(const std::string& input);
 

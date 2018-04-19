@@ -6,7 +6,8 @@
 #include "FunctionParser.h"
 #include "Lexer.h"
 
-#include <regex>
+#include <algorithm>
+#include <cassert>
 
 namespace
 {
@@ -15,8 +16,18 @@ void validateFunctionSpec(const FunctionSpec& /*spec*/)
 {
 }
 
-void validateFunctionCall(const FunctionCall& /*spec*/)
+void validateFunctionCall(const FunctionCall& call)
 {
+    const auto isNamedParameter = [](const FunctionCallParameter& param)
+    {
+        return param.name.is_initialized();
+    };
+
+    const auto firstNamed = std::find_if(call.parameters.begin(), call.parameters.end(),
+            isNamedParameter);
+    const auto unnamed = std::find_if_not(firstNamed, call.parameters.end(), isNamedParameter);
+
+    assert(unnamed == call.parameters.end());
 }
 
 } // namespace

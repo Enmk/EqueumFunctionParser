@@ -14,7 +14,7 @@
 
 struct Token;
 
-enum LexemeType
+enum LexemeType : int
 {
     LEX_NUMBER_LITERAL, // number, integer or with decimal point, with leading '+' or '-'
     LEX_STRING_LITERAL, // quoted string

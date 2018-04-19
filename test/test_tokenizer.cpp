@@ -5,6 +5,8 @@
 
 #include "Tokenizer.h"
 
+#include "Utility.h"
+
 #include <gtest/gtest.h>
 
 #include <boost/preprocessor/stringize.hpp>
@@ -12,34 +14,6 @@
 #include <ostream>
 #include <unordered_map>
 #include <vector>
-
-inline std::ostream& operator<<(std::ostream& ostr, TokenType tokenType)
-{
-#define TYPE_STRING(T) {T, BOOST_PP_STRINGIZE(T)}
-    static const std::unordered_map<size_t, const char*> TokenTypeNames =
-    {
-        TYPE_STRING(TOKEN_WHITESPACE),
-        TYPE_STRING(TOKEN_LPAR),
-        TYPE_STRING(TOKEN_RPAR),
-        TYPE_STRING(TOKEN_OP),
-        TYPE_STRING(TOKEN_PUNCT),
-        TYPE_STRING(TOKEN_STRING),
-        TYPE_STRING(TOKEN_QUOTED_STRING),
-        TYPE_STRING(TOKEN_NUMBER),
-        TYPE_STRING(TOKEN_END_OF_INPUT),
-    };
-    return ostr << TokenTypeNames.at(tokenType);
-}
-
-inline std::ostream& operator<<(std::ostream& ostr, const Token& token)
-{
-    return ostr << "Token{\"" << token.value << "\", " << token.type << "}";
-}
-
-inline bool operator==(const Token& left, const Token& right)
-{
-    return left.type == right.type && left.value == right.value;
-}
 
 static const Token EofToken{boost::string_view(), TOKEN_END_OF_INPUT};
 

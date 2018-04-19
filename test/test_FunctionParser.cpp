@@ -5,8 +5,9 @@
 
 #include "FunctionParser.h"
 
-#include <gtest/gtest.h>
+#include "Utility.h"
 
+#include <gtest/gtest.h>
 
 #include <ostream>
 #include <unordered_map>
@@ -16,44 +17,6 @@ namespace
 {
 const boost::optional<std::string> UnsetOptionalString;
 } // namespace
-
-template <typename T>
-bool isEqualParameters(const T& left, const T& right)
-{
-    return left.name == right.name && left.value == right.value;
-}
-
-inline bool operator==(const FunctionSpecParameter& left, const FunctionSpecParameter& right)
-{
-    return isEqualParameters(left, right);
-}
-
-inline bool operator==(const FunctionCallParameter& left, const FunctionCallParameter& right)
-{
-    return isEqualParameters(left, right);
-}
-
-inline std::ostream& operator<<(std::ostream& ostr, const FunctionSpecParameter& spec)
-{
-    ostr << spec.name;
-    if (spec.value)
-    {
-        ostr << "=" << *spec.value;
-    }
-
-    return ostr;
-}
-
-inline std::ostream& operator<<(std::ostream& ostr, const FunctionCallParameter& spec)
-{
-    if (spec.name)
-    {
-        ostr << *spec.name << " = ";
-    }
-
-    return ostr << spec.value;
-}
-
 
 struct FunctionParserSpecTestCase
 {
@@ -149,20 +112,8 @@ struct FunctionParserCallTestCase
 
 inline std::ostream& operator<<(std::ostream& ostr, const FunctionParserCallTestCase& testCase)
 {
-    ostr << "ParseFunctionCallTestCase{\n\t\"" << testCase.input << "\""
-            << ",\n\t" << testCase.call.name << "(";
-
-    for (const auto& p : testCase.call.parameters)
-    {
-        ostr << " " << p;
-
-        if (&p != &testCase.call.parameters.back())
-        {
-            ostr << ", ";
-        }
-    }
-
-    return ostr << ")\n}";
+    return ostr << "ParseFunctionCallTestCase{\n\t\"" << testCase.input << "\""
+            << ",\n\t" << testCase.call << "\n}";
 }
 
 const FunctionParserCallTestCase CallTestCases[] =
