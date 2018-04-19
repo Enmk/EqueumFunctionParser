@@ -33,29 +33,21 @@ struct Lexeme
     LexemeType type;
 };
 
-//class LexerException : public std::exception
-//{
-//public:
-//    explicit LexerException(std::string message);
-//    ~LexerException() override;
-
-//    const char* what() const noexcept override;
-
-//private:
-//    const std::string message;
-//};
-
 class Tokenizer;
 
 class Lexer
 {
 public:
-    explicit Lexer(const std::string& input);
+    explicit Lexer(std::string input);
     ~Lexer();
 
     Lexeme getNextLexeme();
+protected:
+    void pushToken(const Token& token);
+    Lexeme buildLexeme();
 
 private:
+    std::string input;
     Tokenizer tokenizer;
     std::deque<Token> stack;
 };

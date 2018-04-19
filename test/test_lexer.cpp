@@ -75,29 +75,39 @@ const LexerTestCase LexSimpleTestCases[] =
 
 const LexerTestCase LexCompoundTestCases[] =
 {
-//    {
-//        "abc123(a=1)",
-//        {
-//            Lexeme{"abc123", LEX_NAME},
-//            Lexeme{"(", LEX_LEFT_PARENTHESIS},
-//            Lexeme{"a", LEX_NAME},
-//            Lexeme{"=", LEX_OPERATOR},
-//            Lexeme{"1", LEX_NUMBER_LITERAL},
-//            Lexeme{")", LEX_RIGHT_PARENTHESIS},
-//        }
-//    },
-//    {
-//        // same case as above, but with whitespaces.
-//        " abc123 ( a = 1 ) ",
-//        {
-//            Lexeme{"abc123", LEX_NAME},
-//            Lexeme{"(", LEX_LEFT_PARENTHESIS},
-//            Lexeme{"a", LEX_NAME},
-//            Lexeme{"=", LEX_OPERATOR},
-//            Lexeme{"1", LEX_NUMBER_LITERAL},
-//            Lexeme{")", LEX_RIGHT_PARENTHESIS},
-//        }
-//    },
+    {
+        R"( abc 123 def 456 "foo")",
+        {
+            Lexeme{"abc", LEX_NAME},
+            Lexeme{"123", LEX_NUMBER_LITERAL},
+            Lexeme{"def", LEX_NAME},
+            Lexeme{"456", LEX_NUMBER_LITERAL},
+            Lexeme{R"("foo")", LEX_STRING_LITERAL},
+        }
+    },
+    {
+        "abc123(a=1)",
+        {
+            Lexeme{"abc123", LEX_NAME},
+            Lexeme{"(", LEX_LEFT_PARENTHESIS},
+            Lexeme{"a", LEX_NAME},
+            Lexeme{"=", LEX_OPERATOR},
+            Lexeme{"1", LEX_NUMBER_LITERAL},
+            Lexeme{")", LEX_RIGHT_PARENTHESIS},
+        }
+    },
+    {
+        // same case as above, but with whitespaces.
+        " abc123 ( a = 1 ) ",
+        {
+            Lexeme{"abc123", LEX_NAME},
+            Lexeme{"(", LEX_LEFT_PARENTHESIS},
+            Lexeme{"a", LEX_NAME},
+            Lexeme{"=", LEX_OPERATOR},
+            Lexeme{"1", LEX_NUMBER_LITERAL},
+            Lexeme{")", LEX_RIGHT_PARENTHESIS},
+        }
+    },
     {
         R"( abc123(first=4.56, second="foo") )",
         {
@@ -121,7 +131,8 @@ class LexerTest : public ::testing::TestWithParam<LexerTestCase>
 TEST_P(LexerTest, getNextLexeme)
 {
     const LexerTestCase& testCase = GetParam();
-    Lexer lexer(testCase.input);
+    const std::string input = testCase.input;
+    Lexer lexer(input);
 
     for (const auto& expectedLexeme : testCase.expectedLexemes)
     {
@@ -130,10 +141,10 @@ TEST_P(LexerTest, getNextLexeme)
     }
 }
 
-//INSTANTIATE_TEST_CASE_P(
-//        Simple, LexerTest,
-//        ::testing::ValuesIn(LexSimpleTestCases),
-//);
+INSTANTIATE_TEST_CASE_P(
+        Simple, LexerTest,
+        ::testing::ValuesIn(LexSimpleTestCases),
+);
 
 INSTANTIATE_TEST_CASE_P(
         Compound, LexerTest,

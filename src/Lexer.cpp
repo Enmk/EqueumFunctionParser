@@ -155,15 +155,87 @@ LexemeBuilder* makeLexemeBuilder(const Token& token)
     return nullptr;
 }
 
-Lexeme buildLexeme(std::deque<Token>& tokens)
+} // namespace
+
+Lexer::Lexer(std::string _input)
+    : input(std::move(_input)),
+      tokenizer(input)
+{}
+
+Lexer::~Lexer()
+{}
+
+Lexeme Lexer::getNextLexeme()
 {
-    if (tokens.empty())
+    Token nextToken = tokenizer.peekNextToken();
+    while(nextToken.type != TOKEN_END_OF_INPUT)
     {
-        assert(false && "Can't build Lexeme from empty tokens stack.");
+        if (isTerminalToken(nextToken))
+        {
+            if (!(stack.empty() && nextToken.type == TOKEN_WHITESPACE))
+            {
+                if (stack.empty())
+                {
+                    pushToken(tokenizer.getNextToken());
+                }
+
+                return buildLexeme();
+            }
+        }
+        pushToken(tokenizer.getNextToken());
+        nextToken = tokenizer.peekNextToken();
+    }
+    return buildLexeme();
+
+//    if (!stack.empty())
+//    {
+//        return buildLexeme(stack);
+//    }
+
+//    Token token = tokenizer.getNextToken();
+//    while(token.type != TOKEN_END_OF_INPUT)
+//    {
+//        pushToken(token);
+
+
+//        if (isTerminalToken(token)
+//            // skipping initial whitespace
+//            && !(stack.empty() && token.type == TOKEN_WHITESPACE))
+//        {
+//            break;
+//        }
+
+//        token = tokenizer.getNextToken();
+//    }
+
+//    if (stack.empty()
+//            && (token.type == TOKEN_END_OF_INPUT
+//                || token.type == TOKEN_WHITESPACE))
+//    {
+//        return Lexeme{std::string(), LEX_END_OF_INPUT};
+//    }
+
+//    return buildLexeme(stack);
+}
+
+void Lexer::pushToken(const Token& token)
+{
+    if (token.type != TOKEN_WHITESPACE)
+    {
+        stack.push_back(token);
+    }
+}
+
+Lexeme Lexer::buildLexeme()
+{
+    if (stack.empty())
+    {
+        //assert(false && "Can't build Lexeme from empty tokens stack.");
+        return Lexeme{std::string(), LEX_END_OF_INPUT};
     }
 
-    Token token = tokens.front();
-    tokens.pop_front();
+    Token token = stack.front();
+    stack.pop_front();
     if (isTerminalToken(token))
     {
         return Lexeme{token.value.to_string(), convertTokenTypeToLexemeType(token.type)};
@@ -173,76 +245,15 @@ Lexeme buildLexeme(std::deque<Token>& tokens)
     do
     {
         lexemeBuilder->consumeToken(token);
-        if (tokens.empty() || isTerminalToken(tokens.front()))
+        if (stack.empty() || isTerminalToken(stack.front()))
         {
             break;
         }
 
-        token = tokens.front();
-        tokens.pop_front();
+        token = stack.front();
+        stack.pop_front();
     }
     while (true);
 
     return lexemeBuilder->produceLexeme();
-}
-
-} // namespace
-
-//LexerException::LexerException(std::string message)
-//    : message(std::move(message))
-//{}
-
-//LexerException::~LexerException()
-//{}
-
-//const char* LexerException::what() const noexcept
-//{
-//    return message.c_str();
-//}
-
-Lexer::Lexer(const std::string& input)
-    : tokenizer(input)
-{}
-
-Lexer::~Lexer()
-{}
-
-Lexeme Lexer::getNextLexeme()
-{
-    // For all tokens in a tokenizer:
-    //    if token is terminal:
-    //        produce lexeme from current stack
-    //        put token to stack
-    //        return
-    if (!stack.empty())
-    {
-        return buildLexeme(stack);
-    }
-
-    Token token = tokenizer.getNextToken();
-    while(token.type != TOKEN_END_OF_INPUT)
-    {
-        if (token.type != TOKEN_WHITESPACE)
-        {
-            stack.push_back(token);
-        }
-
-        if (isTerminalToken(token)
-            // skipping initial whitespace
-            && !(stack.empty() && token.type == TOKEN_WHITESPACE))
-        {
-            break;
-        }
-
-        token = tokenizer.getNextToken();
-    }
-
-    if (stack.empty()
-            && (token.type == TOKEN_END_OF_INPUT
-                || token.type == TOKEN_WHITESPACE))
-    {
-        return Lexeme{std::string(), LEX_END_OF_INPUT};
-    }
-
-    return buildLexeme(stack);
 }

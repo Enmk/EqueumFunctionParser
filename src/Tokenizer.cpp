@@ -102,7 +102,7 @@ Tokenizer::Tokenizer(const std::string& string)
 {
 }
 
-Token Tokenizer::getNextToken()
+Token Tokenizer::peekNextToken() const
 {
     if (input.empty())
     {
@@ -123,16 +123,19 @@ Token Tokenizer::getNextToken()
         {
             return tokenType == getCharacterTokenType(c);
         });
-//        if (p != input.end())
-//        {
-
-//        }
 
         tokenLen = p - input.begin();
     }
     tokenLen = std::min(getMaxTokenLength(tokenType), tokenLen);
     const Token result{input.substr(0, tokenLen), tokenType};
-    input.remove_prefix(tokenLen);
+
+    return result;
+}
+
+Token Tokenizer::getNextToken()
+{
+    const Token result = peekNextToken();
+    input.remove_prefix(result.value.length());
 
     return result;
 }

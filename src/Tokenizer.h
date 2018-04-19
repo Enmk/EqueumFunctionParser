@@ -33,6 +33,7 @@ class Tokenizer
 public:
     explicit Tokenizer(const std::string& string);
 
+    Token peekNextToken() const;
     Token getNextToken();
 //    boost::string_view getRemainder() const;
 
