@@ -131,8 +131,7 @@ class LexerTest : public ::testing::TestWithParam<LexerTestCase>
 TEST_P(LexerTest, getNextLexeme)
 {
     const LexerTestCase& testCase = GetParam();
-    const std::string input = testCase.input;
-    Lexer lexer(input);
+    Lexer lexer(testCase.input);
 
     for (const auto& expectedLexeme : testCase.expectedLexemes)
     {

@@ -4,47 +4,64 @@
 */
 
 #include "FunctionParser.h"
-#include "Tokenizer.h"
+#include "Lexer.h"
 
 #include <regex>
 
 namespace
 {
-const char* NameRegexPattern = "[_a-zA-Z][_a-zA-Z0-9]*";
+
+void validateFunctionSpec(const FunctionSpec& /*spec*/)
+{
+}
+
 } // namespace
 
-ParserException::ParserException(
-        std::string message,
-        std::string input,
-        size_t position)
-    : message(std::move(message)),
-      input(std::move(input)),
-      position(position)
-{
-}
 
-const char* ParserException::what() const noexcept
+FunctionSpec parseFunctionSpec(const std::string& input)
 {
-    return message.c_str();
-}
+    FunctionSpec result;
 
-std::string ParserException::getInput() const
-{
-    return input;
-}
+    Lexer lexer(input);
 
-size_t ParserException::getPosition() const
-{
-    return position;
-}
+    Lexeme lex = lexer.getNextLexeme();
+    assert(lex.type == LEX_NAME);
+    result.name = lex.value;
 
-bool isValidName(const std::string& name) noexcept
-{
-    static const std::regex NameRegex(NameRegexPattern);
-    return std::regex_match(name, NameRegex);
-}
+    assert(lexer.getNextLexeme().type == LEX_LEFT_PARENTHESIS);
+    // parsing arguments
+    while (true)
+    {
+        lex = lexer.getNextLexeme();
+        if (lex.type == LEX_RIGHT_PARENTHESIS && lex.value == ")")
+        {
+            // do not expect nested parenthesis here.
+            break;
+        }
+        if (lex.type == LEX_PUNCTUATION && lex.value == ",")
+        {
+            // skip to the next argument.
+            continue;
+        }
 
-FunctionSpec parseFunctionSpec(std::string& /*input*/)
-{
-    return FunctionSpec();
+        result.parameters.push_back(FunctionSpecParameter{});
+        FunctionSpecParameter& paramSpec = result.parameters.back();
+
+        assert(lex.type == LEX_NAME);
+        paramSpec.name = lex.value;
+
+        lex = lexer.getNextLexeme();
+        if (lex.type == LEX_OPERATOR && lex.value == "=")
+        {
+            // next is default value
+
+            lex = lexer.getNextLexeme();
+            assert(lex.type == LEX_NUMBER_LITERAL || lex.type == LEX_STRING_LITERAL);
+            paramSpec.value = lex.value;
+        }
+    }
+
+    validateFunctionSpec(result);
+
+    return result;
 }

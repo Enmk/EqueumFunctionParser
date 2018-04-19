@@ -12,54 +12,39 @@
 #include <string>
 #include <vector>
 
-struct FunctionParameterSpec
+struct FunctionSpecParameter
 {
     std::string name;
-    boost::optional<std::string> defaultValue;
+    boost::optional<std::string> value;
 };
 
 struct FunctionSpec
 {
     std::string name;
-    std::vector<FunctionParameterSpec> parametersSpec;
+    std::vector<FunctionSpecParameter> parameters;
 };
 
-class ParserException : public std::exception
+struct FunctionCallParameter
 {
-public:
-    ParserException(
-            std::string message,
-            std::string input,
-            size_t position);
-
-    const char* what() const noexcept override;
-    std::string getInput() const;
-    size_t getPosition() const;
-
-private:
-    const std::string message;
-    const std::string input;
-    const size_t position;
+    boost::optional<std::string> name;
+    std::string value;
 };
 
-/** Checks if given string is a valid name.
- * Name rules are the same for functions and arguments:
- * [_a-zA-Z][_a-zA-Z0-9]*
- *
- * @param name - value to verify.
- * @return true if name is valid name according to language rules.
- */
-bool isValidName(const std::string& name) noexcept;
+struct FunctionCall
+{
+    std::string name;
+    std::vector<FunctionCallParameter> parameters;
+};
 
 /** Parse function spec from given input.
  *
  * Parsing is performed by skipping any leading whitespace first.
- * Input is modified to contain only symbols past function spec.
  *
  * @param input - input string containing function spec.
  * @return FunctionSpec object.
  * @throw exception if input has no function spec.
  */
-FunctionSpec parseFunctionSpec(std::string& input);
+FunctionSpec parseFunctionSpec(const std::string& input);
+FunctionCall parseFunctionCall(const std::string& input);
 
 #endif // EQUEUM_FUNCTION_PARSER_FUNCTION_PARSER_H_INCLUDED
