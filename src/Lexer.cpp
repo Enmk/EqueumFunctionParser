@@ -7,8 +7,10 @@
 
 #include "Tokenizer.h"
 
+#include <cassert>
 #include <deque>
 #include <vector>
+#include <memory>
 
 namespace
 {
@@ -46,6 +48,8 @@ LexemeType convertTokenTypeToLexemeType(TokenType tokenType)
             return LEX_NUMBER_LITERAL;
         case TOKEN_END_OF_INPUT:
             return LEX_END_OF_INPUT;
+        default:
+            assert(false && "Unsupported token type.");
     }
 }
 
@@ -186,36 +190,6 @@ Lexeme Lexer::getNextLexeme()
         nextToken = tokenizer.peekNextToken();
     }
     return buildLexeme();
-
-//    if (!stack.empty())
-//    {
-//        return buildLexeme(stack);
-//    }
-
-//    Token token = tokenizer.getNextToken();
-//    while(token.type != TOKEN_END_OF_INPUT)
-//    {
-//        pushToken(token);
-
-
-//        if (isTerminalToken(token)
-//            // skipping initial whitespace
-//            && !(stack.empty() && token.type == TOKEN_WHITESPACE))
-//        {
-//            break;
-//        }
-
-//        token = tokenizer.getNextToken();
-//    }
-
-//    if (stack.empty()
-//            && (token.type == TOKEN_END_OF_INPUT
-//                || token.type == TOKEN_WHITESPACE))
-//    {
-//        return Lexeme{std::string(), LEX_END_OF_INPUT};
-//    }
-
-//    return buildLexeme(stack);
 }
 
 void Lexer::pushToken(const Token& token)

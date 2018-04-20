@@ -2,9 +2,8 @@
  * This file is licensed under CC0 license.
  * Author: Vasily Nemkov (v.nemkov@gmail.com)
 */
-
-#include "FunctionRegistry.h"
 #include "FunctionParser.h"
+#include "FunctionRegistry.h"
 
 #include "Utility.h"
 

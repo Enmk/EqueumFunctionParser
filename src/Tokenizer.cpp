@@ -34,7 +34,7 @@ TokenType getCharacterTokenType(char c)
     {
         return TOKEN_WHITESPACE;
     }
-    else if (isnumber(c))
+    else if (isdigit(c))
     {
         return TOKEN_NUMBER;
     }

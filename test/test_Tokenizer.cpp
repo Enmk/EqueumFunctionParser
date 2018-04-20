@@ -41,7 +41,8 @@ TEST_P(TokenTest, getNextToken)
 {
     const TokenTestCase& testCase = GetParam();
 
-    Tokenizer tokenizer(testCase.input);
+    std::string input(testCase.input);
+    Tokenizer tokenizer(input);
     for (const auto& expectedToken : testCase.expectedTokens)
     {
         const Token actualToken = tokenizer.getNextToken();

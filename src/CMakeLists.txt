@@ -20,3 +20,7 @@ add_library(
     Lexer.cpp
     FunctionRegistry.cpp
 )
+
+target_include_directories(function_parser SYSTEM PRIVATE
+    "${Boost_INCLUDE_DIR}"
+)

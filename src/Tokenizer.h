@@ -6,9 +6,23 @@
 #ifndef EQUEUM_FUNCTION_PARSER_TOKENIZER_H_INCLUDED
 #define EQUEUM_FUNCTION_PARSER_TOKENIZER_H_INCLUDED
 
-#include <boost/utility/string_view.hpp>
+#include <boost/version.hpp>
+
+#if BOOST_VERSION < 106000
+    #include <boost/utility/string_ref.hpp>
+#else
+    #include <boost/utility/string_view.hpp
+#endif
 
 #include <string>
+
+// Hackety hack, compatibility with boost prior to 1.60.00
+#if BOOST_VERSION < 106000
+namespace boost
+{
+using string_view = boost::string_ref;
+}
+#endif
 
 enum TokenType : int
 {

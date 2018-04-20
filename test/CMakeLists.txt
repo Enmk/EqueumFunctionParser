@@ -16,6 +16,10 @@ target_include_directories(test_function_parser
     ../src
 )
 
+target_include_directories(test_function_parser
+    SYSTEM PRIVATE "${Boost_INCLUDE_DIR}"
+)
+
 target_link_libraries(test_function_parser
     PRIVATE
     gtest
