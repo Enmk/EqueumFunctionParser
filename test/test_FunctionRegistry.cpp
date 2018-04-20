@@ -38,13 +38,13 @@ std::ostream& operator<<(std::ostream& ostr, const FunctionRegistryTestCase& tes
 const FunctionRegistryTestCase FunctionRegistryTestCases[] =
 {
     {
-        "funcky_function(a, b=24, c=56, d=78)",
+        "funky_function(a, b=24, c=56, d=78)",
         // Original:
-       "funcky_function(1, d=10)",
+       "funky_function(1, d=10)",
         // Updated:
         FunctionCall
         {
-            "funcky_function",
+            "funky_function",
             {
                 FunctionCallParameter{std::string("a"), "1"},
                 FunctionCallParameter{std::string("b"), "24"},
@@ -66,10 +66,14 @@ TEST_P(FunctionRegistryTest, BasicTest)
 
     FunctionRegistry registry;
     const auto name = registry.addFunction(testCase.input);
+    ASSERT_EQ(testCase.updatedCall.name, name);
+
     const FunctionCall call = parseFunctionCall(testCase.call);
     const FunctionCall updated = registry.updateFunctionCall(call);
 
     ASSERT_EQ(testCase.updatedCall, updated);
+
+    registry.deleteFunctionSpecByName(name);
 }
 
 INSTANTIATE_TEST_CASE_P(

@@ -19,9 +19,11 @@ FunctionRegistry::~FunctionRegistry()
 std::string FunctionRegistry::addFunction(const std::string& functionSpecification)
 {
     FunctionSpec spec = parseFunctionSpec(functionSpecification);
-    functionSpecs.emplace(spec.name, std::move(spec));
 
-    return spec.name;
+    const std::string name = spec.name;
+    functionSpecs.emplace(name, std::move(spec));
+
+    return name;
 }
 
 FunctionSpec FunctionRegistry::getFunctionSpecByName(const std::string& functionName) const
@@ -29,13 +31,17 @@ FunctionSpec FunctionRegistry::getFunctionSpecByName(const std::string& function
     return functionSpecs.at(functionName);
 }
 
-void FunctionRegistry::deleteFunctionSpecByName(const std::string& functionName)
+bool FunctionRegistry::deleteFunctionSpecByName(const std::string& functionName)
 {
     const auto p = functionSpecs.find(functionName);
     if (p != functionSpecs.end())
     {
         functionSpecs.erase(p);
+
+        return true;
     }
+
+    return false;
 }
 
 FunctionCall FunctionRegistry::updateFunctionCall(const FunctionCall& call) const

@@ -19,7 +19,7 @@ public:
 
     std::string addFunction(const std::string& functionSpecification);
     FunctionSpec getFunctionSpecByName(const std::string& functionName) const;
-    void deleteFunctionSpecByName(const std::string& functionName);
+    bool deleteFunctionSpecByName(const std::string& functionName);
 
     FunctionCall updateFunctionCall(const FunctionCall& call) const;
 
